@@ -7,16 +7,37 @@ export default function Product(id, title, image, altText, inventory, variants) 
     let variantQuantity;
     let variantTitle;
     let variantArray = [];
+    let barcode;
+    let sku;
     
+    function VariantKey(id, barcode, sku){
+        let retval;
+
+        if (sku != undefined){
+            retval = `SKU: ${sku}`;
+        } else if (id.barcode != undefined){
+            retval = `BARCODE: ${barcode}`;
+        } else if (id.id != undefined){
+            retval = `ID: ${id.id}`;
+        }
+
+        return(retval);
+    }
     for (i in variants){
         variantTitle = variants[i].node.title;
         variantId = variants[i].node.id.replace(/\D/g, '');
+        barcode = variants[i].node.barcode;
         variantQuantity = variants[i].node.inventoryQuantity;
+        sku = variants[i].node.sku;
+        if(barcode == null){
+            barcode = undefined;
+        }
+
         variantArray.push(
         <Stack key={variantId}
                distribution='fillEvenly'>
             <Stack.Item>
-                <p>ID: {variantId}</p>
+                <p><VariantKey id={variantId} barcode={barcode} sku={sku} /></p>
             </Stack.Item>
             <Stack.Item>
                 <p>{variantTitle}</p>

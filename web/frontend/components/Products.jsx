@@ -10,13 +10,14 @@ import {
 } from "@shopify/polaris";
 import Product from "./Product";
 import noImage from "../assets/no-image.jpg";
-import { useAuthenticatedFetch } from "../hooks";
-import { useAppQuery } from "../hooks/useAppQuery";
+import { useGetNext } from "../hooks";
+import { useAppQuery } from "../hooks";
 
 export default function Products() {
   const [isLoading, setIsLoading] = useState(true);
 
   let i = 0;
+  let j = 0;
   let title;
   let id;
   let featuredImage;
@@ -32,19 +33,17 @@ export default function Products() {
 
   const {
       data,
-      refetch,
       isLoading:dataIsLoading,
-      error
+      error,
     } = useAppQuery({
       url: "/api/products/fetch",
       reactQueryOptions: {
         onSuccess: () => {
           setIsLoading(false);
         },
-        keepPreviousData:true,
       },
-    });
-  
+    }); 
+
     if (dataIsLoading) {
       return (
         <div>
@@ -64,11 +63,11 @@ export default function Products() {
       );
     }
 
-  items = data.products.edges;
-  cursor = items[items.length - 1].cursor;
   hasNext = data.products.pageInfo.hasNextPage;
   hasPrevious = data.products.pageInfo.hasPreviousPage;
 
+  items = data.products.edges;
+  
   for (i in items) {
     title = items[i].node.title;
     id = items[i].node.id.replace(/\D/g, "");
@@ -90,16 +89,15 @@ export default function Products() {
   }
 
   function nextPage(cursor) {
-    refetch({
-      after: cursor,
-    });
+    
   }
 
   function previousPage(cursor) {
-    refetch({
+    useAppQuery({
       before: cursor,
     });
   }
+   
   return (
     <>
       {retval}

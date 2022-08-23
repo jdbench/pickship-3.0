@@ -7,7 +7,7 @@ query ProductsQuery(
   $before: String
   $query: String
 ) {
-  products(first: 10, after: $after, before: $before, query: $query) {
+  products(first: 50, after: $after, before: $before, query: $query) {
     edges {
       cursor
       node {
@@ -51,7 +51,7 @@ export default async function productGetter(session) {
     const products = await client.query({
     data: GET_PRODUCTS_QUERY,
     });
-    
+
     return products;
 
   } catch (error) {
