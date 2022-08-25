@@ -10,8 +10,10 @@ import {
 } from "@shopify/polaris";
 import Product from "./Product";
 import noImage from "../assets/no-image.jpg";
-import { useGetNext } from "../hooks";
+import { useAuthenticatedFetch } from "../hooks";
 import { useAppQuery } from "../hooks";
+import { useInfiniteAppQuery } from "../hooks/useInifinteQuery";
+import { useInfiniteQuery } from "react-query";
 
 export default function Products() {
   const [isLoading, setIsLoading] = useState(true);
@@ -30,14 +32,23 @@ export default function Products() {
   let hasNext;
   let hasPrevious;
   let inventory;
+  let page;
+  let fetch = useAuthenticatedFetch();
+
+  async function getProducts({ page = 0 }){
+    const response = await fetch('/api/products/fetch?page=' + page)
+    const products = (await response.json())
+    return products;
+  }
 
   const {
       data,
       isLoading:dataIsLoading,
       error,
-    } = useAppQuery({
-      url: "/api/products/fetch",
+    } = useInfiniteAppQuery({
+      url:'api/products/fetch',
       reactQueryOptions: {
+        getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
         onSuccess: () => {
           setIsLoading(false);
         },
@@ -62,11 +73,12 @@ export default function Products() {
         </div>
       );
     }
+for (j in data.pages){
+  page = data.pages[j];
+  hasNext = page.products.pageInfo.hasNextPage;
+  hasPrevious = page.products.pageInfo.hasPreviousPage;
 
-  hasNext = data.products.pageInfo.hasNextPage;
-  hasPrevious = data.products.pageInfo.hasPreviousPage;
-
-  items = data.products.edges;
+  items = page.products.edges;
   
   for (i in items) {
     title = items[i].node.title;
@@ -87,7 +99,7 @@ export default function Products() {
       Product(id, title, transformedSrc, altText, inventory, variants)
     );
   }
-
+}
   function nextPage(cursor) {
     
   }

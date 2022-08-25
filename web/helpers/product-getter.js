@@ -7,7 +7,7 @@ query ProductsQuery(
   $before: String
   $query: String
 ) {
-  products(first: 50, after: $after, before: $before, query: $query) {
+  products(first: 10, after: $after, before: $before, query: $query) {
     edges {
       cursor
       node {
